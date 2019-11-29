@@ -105,3 +105,4 @@ venv.bak/
 .idea/
 tmp.py
 models/model.h5
+settings/env
