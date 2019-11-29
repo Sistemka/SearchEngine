@@ -5,8 +5,7 @@ from keras.models import load_model
 from settings.paths import MODEL_PATH
 
 
-
-labels = {
+all_labels = {
         'pants', 'sweaters', 'shorts',
         'type1', 'shirts', 'jackets',
         'scarfs', 'boots', 'caps', 'sneakers'
@@ -15,27 +14,25 @@ labels = {
 model = load_model(MODEL_PATH)
 
 
-def predict(new_image):
-    counter = 0
-    results = []
-    for label in labels:
-        vectors = Vectors.select().where(Vectors.type == label)
-        for v in vectors:
+def predict(
+        input_tensor,
+        next_step_accuracy_percent=0.5,
+        next_step_point=2,
+        comparing_percent=0.8
+):
+    matching_items = []
+    for label in all_labels:
+        currently_accepted_items = []
+        comparing_list = []
+        all_vectors = Vectors.select().where(Vectors.type == label)
+        for v in all_vectors:
             vec = np.frombuffer(v.vector, dtype='float32').reshape((224, 224, 3))
-            result = model.predict([np.expand_dims(vec, 0), new_image])
-            if counter >= 5:
-                counter = 0
+            comparing_tensor = np.expand_dims(vec, 0)
+            compare_result = model.predict([input_tensor, comparing_tensor])[0][0]
+            comparing_list.append(compare_result)
+            if compare_result > comparing_percent:
+                currently_accepted_items.append({"url": v.url, "type": label})
+            if len(comparing_list) > next_step_point and sum(comparing_list) / len(comparing_list) < next_step_accuracy_percent:
                 break
-            if result[0][0] < 0.6:
-                counter += 1
-            else:
-                results.append((v.url, result[0][0], v.type))
-
-    return [
-        {
-            'url': item[0],
-            'type': item[2]
-        }
-        for item in
-        sorted(results, reverse=True, key=lambda tup: tup[1])[:3]
-    ]
+        matching_items.extend(currently_accepted_items)
+    return matching_items
