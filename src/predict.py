@@ -1,3 +1,5 @@
+from random import shuffle
+
 from models import Vectors
 import numpy as np
 
@@ -24,7 +26,8 @@ def predict(
     for label in all_labels:
         currently_accepted_items = []
         comparing_list = []
-        all_vectors = Vectors.select().where(Vectors.type == label)
+        all_vectors = list(Vectors.select().where(Vectors.type == label))
+        shuffle(all_vectors)
         for v in all_vectors:
             vec = np.frombuffer(v.vector, dtype='float32').reshape((224, 224, 3))
             comparing_tensor = np.expand_dims(vec, 0)
