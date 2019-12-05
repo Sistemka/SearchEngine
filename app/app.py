@@ -12,17 +12,12 @@ api = Api(
     app=app,
     doc='/swagger-ui',
     title='SearchEngine',
-    description='Service to convert image to vector'
+    description='Service to search in our image data base'
 )
 
 
 basic_args = reqparse.RequestParser(bundle_errors=True, trim=True)
 basic_args.add_argument('X-SERVICE-NAME', location='headers', required=True, nullable=False)
 
-image_args = reqparse.RequestParser(bundle_errors=True, trim=True)
-image_args.add_argument('image', type=FileStorage, location='files', required=True)
-image_args.add_argument('url', type=str, location='args', required=True)
-image_args.add_argument('type', type=str, location='args', required=True)
-
-predict_image_args = reqparse.RequestParser(bundle_errors=True, trim=True)
-predict_image_args.add_argument('image', type=FileStorage, location='files', required=True)
+search_image_args = reqparse.RequestParser(bundle_errors=True, trim=True)
+search_image_args.add_argument('image', type=FileStorage, location='files', required=True)
