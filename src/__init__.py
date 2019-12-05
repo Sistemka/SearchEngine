@@ -1,7 +1,7 @@
-from .image_to_vector import image_to_vector
-from .predict import predict
+from .indexing import indexing
+from .predictor import predictor
 
 __all__ = [
-    'image_to_vector',
-    'predict'
+    'indexing',
+    'predictor'
 ]
