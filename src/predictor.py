@@ -32,8 +32,16 @@ def load_predictor():
     knn = NearestNeighbors(metric='cosine', algorithm='brute')
     knn.fit(vecs)
 
-    def similarity(file_path, n_neighbors=6):
-        vec = _vectorize(file_path, model)
+    def similarity(file_path=None, vec=None, n_neighbors=6):
+        if file_path is None and vec is None:
+            raise ValueError("you should pass 'file_path' or 'vector'")
+
+        if file_path is not None and vec is not None:
+            raise ValueError("you can't pass 'file_path' and 'vector' simultaneously")
+
+        if file_path:
+            vec = _vectorize(file_path, model)
+
         return _similar(vec, knn, urls, n_neighbors)
 
     return similarity
